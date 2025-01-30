@@ -1,0 +1,4 @@
+1. initialize the backend project (node js)
+npm init -y 
+2. install require libraries and express app
+npm install express path cors bcrypt mongoose dotenv nodemon

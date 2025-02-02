@@ -3,6 +3,7 @@ import User from "../models/User.js";
 const UserRoutes = express.Router()  //Create router
 //API for add users
 UserRoutes.post('/add-user', async (req,res) => {
+    console.log(req.body)
     try{
         const {name, email, mobile} = req.body;
         const newUser = new User({name,mobile,email})
@@ -41,7 +42,7 @@ UserRoutes.delete(`/delete-user/:id`, async (req, res) =>{
 })
 
 //API for Update the Existed User Details
-UserRoutes.put("/update-user/:id", async (req, res) => {
+UserRoutes.put(`/update-user/:id`, async (req, res) => {
     try {
         const userId = req.params.id;
         const updatedData = req.body;

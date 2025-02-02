@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-
+import noData from '../assets/noData.svg'
 const UserInfo = () => {
     const [userData, setUserData] = useState([])
     const [name,setName] = useState("")
@@ -16,19 +16,31 @@ const UserInfo = () => {
         emailError:""
     })
 
+    const onDeleteUser = async (userId) => {
+        try {
+            await axios.delete(`http://localhost:3000/delete-user/${userId}`);
+            setUserData(prevUsers => prevUsers.filter(user => user._id !== userId));
+        } catch (error) {
+            console.log("Error deleting user", error);
+        }
+    };
+    
+
     useEffect(() => {
         axios.get("http://localhost:3000/users")
         .then((response) => {
             setUserData(response.data)
         }).catch((error)=>{
             console.log("Error while fetching", error)
+            
         })
-    },[])
+    },[userData])
 
     const addNewuser = async (newUser) => {
         try{
             const response = await axios.post("http://localhost:3000/add-user", newUser)
             console.log("User Added", response.data)
+            setUserData(prevUsers => [...prevUsers, response.data])
         }catch(error){
             console.log("Error:",error)
         }
@@ -50,7 +62,6 @@ const UserInfo = () => {
             return 
         }
         const newUser = {
-            id:uuidv4(),
             name:name,
             mobile:mobile,
             email:email
@@ -60,7 +71,6 @@ const UserInfo = () => {
         setName("")
         setEmail("")
         setmobile("")
-        console.log(userData)
 
     }
     const onBlur = (e) => {
@@ -71,10 +81,7 @@ const UserInfo = () => {
         }));
     };
 
-    const onDeleteUser = (id) => {
-        const updatedUser = userData.filter(user => user.id !== id);
-        setUserData(updatedUser);
-    }
+    
     
     const onUpdateUser = id => {
         const updateUser = userData.find(user => user.id === id)
@@ -102,17 +109,28 @@ const UserInfo = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {userData.map((user) => (
-                            <tr key={user.id}>
-                                <td className='border border-gray-300 p-2'>{user.name}</td>
-                                <td className='border border-gray-300 p-2'>{user.mobile}</td>
-                                <td className='border border-gray-300 p-2'>{user.email}</td>
-                                <td className='border border-gray-300 p-2'>
-                                    <button className='mr-2 px-2 py-1 bg-blue-500 text-white rounded cursor-pointer' onClick={() => setFormVisible(true)}>Update</button>
-                                    <button className='px-2 py-1 bg-red-500 text-white rounded cursor-pointer' onClick={() => onDeleteUser(user.id)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
+                        {
+                            userData.length === 0? (
+                                <tr>
+                                    <td colSpan="4" className="text-center flex flex-col items-center justify-center">
+                                        <img className='w-100 h-100' src={noData} alt="No Data" />
+                                        <p className='text-3xl font-bold'>No users found</p>
+                                    </td>
+                                </tr>
+                            ):
+                            (userData.map((user) => (
+                                <tr key={user._id}>
+                                    <td className='border border-gray-300 p-2'>{user.name}</td>
+                                    <td className='border border-gray-300 p-2'>{user.mobile}</td>
+                                    <td className='border border-gray-300 p-2'>{user.email}</td>
+                                    <td className='border border-gray-300 p-2'>
+                                        <button className='mr-2 px-2 py-1 bg-blue-500 text-white rounded cursor-pointer' onClick={() => setFormVisible(true)}>Update</button>
+                                        <button className='px-2 py-1 bg-red-500 text-white rounded cursor-pointer' onClick={() => onDeleteUser(user._id)}>Delete</button>
+                                    </td>
+                                </tr>
+                            )))
+                        }
+                        
                     </tbody>
                 </table>
             </div>

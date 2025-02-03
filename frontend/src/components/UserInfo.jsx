@@ -10,6 +10,7 @@ const UserInfo = () => {
     const [mobile, setmobile] = useState("")
     const [email, setEmail] = useState("")
     const [formVisible, setFormVisible] = useState(false)
+    const [editingUserId, setEditingUserId] = useState(null);
     const [error, setError] = useState({
         nameError:"",
         mobileError:"",
@@ -83,13 +84,16 @@ const UserInfo = () => {
 
     
     
-    const onUpdateUser = id => {
-        const updateUser = userData.find(user => user.id === id)
-        setName(updateUser.name)
-        setmobile(updateUser.mobile)
-        setEmail(updateUser.email)
-        setFormVisible(true)
-    }
+    const onUpdateUser = (id) => {
+        const updateUser = userData.find(user => user._id === id);
+        if (updateUser) {
+            setName(updateUser.name);
+            setmobile(updateUser.mobile);
+            setEmail(updateUser.email);
+            setEditingUserId(id);  // Store the ID of the user being edited
+            setFormVisible(true);
+        }
+    };
 
     return (
         <div className='flex flex-col p-10 relative min-h-screen'>
@@ -124,7 +128,7 @@ const UserInfo = () => {
                                     <td className='border border-gray-300 p-2'>{user.mobile}</td>
                                     <td className='border border-gray-300 p-2'>{user.email}</td>
                                     <td className='border border-gray-300 p-2'>
-                                        <button className='mr-2 px-2 py-1 bg-blue-500 text-white rounded cursor-pointer' onClick={() => setFormVisible(true)}>Update</button>
+                                        <button className='mr-2 px-2 py-1 bg-blue-500 text-white rounded cursor-pointer' onClick={() => onUpdateUser(user._id)}>Update</button>
                                         <button className='px-2 py-1 bg-red-500 text-white rounded cursor-pointer' onClick={() => onDeleteUser(user._id)}>Delete</button>
                                     </td>
                                 </tr>
